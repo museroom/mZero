@@ -77,7 +77,7 @@ def main():
                 print( "Not ok: {:6.2f}%\t{}".format(
                     percent_zero, target))
         except Exception as e:
-            logger.error( '{}error: {}'.format( target,e ))
+            logger.error( '{} error: {}'.format( target,e ))
 
 
 if __name__ == "__main__":
