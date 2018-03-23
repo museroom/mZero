@@ -8,9 +8,6 @@ logger = logging.getLogger('zero')
 
 
 def count_zero(filename):
-    logger.debug('counting zero:{}'.format(
-        filename
-    ))
     with open(filename,'rb') as f:
         data = f.read()
     zeros =  len([b for b in data if b == 0])
@@ -18,7 +15,7 @@ def count_zero(filename):
         percent = zeros / len(data) * 100
     else:
         percent = 0
-    logging.info("{:6.2f}%\t{}".format(percent, filename))
+    logger.info("{:6.2f}% {}".format(percent, filename))
     return percent
 
 
@@ -84,7 +81,7 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     # logger.setLevel(logging.ERROR)
     logging.getLogger("PIL").setLevel(logging.ERROR)
-    # logging.basicConfig( level=logging.DEBUG )
+    logging.basicConfig( level=logging.DEBUG )
     # logging.basicConfig( level=logging.ERROR )
     main()
 
