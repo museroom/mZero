@@ -4,7 +4,7 @@ import threading
 import logging
 import argparse
 
-logger = logging.getLogger('zero ')
+logger = logging.getLogger('zero')
 
 
 def count_zero(filename):
@@ -71,10 +71,13 @@ def main():
 
     threshold = float(args.threshold)
     for target in targets:
-        percent_zero = count_zero(target)
-        if percent_zero > threshold:
-            print( "Not ok: {:6.2f}%\t{}".format(
-                percent_zero, target))
+        try:
+            percent_zero = count_zero(target)
+            if percent_zero > threshold:
+                print( "Not ok: {:6.2f}%\t{}".format(
+                    percent_zero, target))
+        except Exception as e:
+            logger.error( '{}error: {}'.format( target,e ))
 
 
 if __name__ == "__main__":
