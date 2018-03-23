@@ -7,19 +7,24 @@ import argparse
 logger = logging.getLogger('zero')
 
 
-def count_zero(filename):
-    with open(filename,'rb') as f:
-        data = f.read()
-    zeros =  len([b for b in data if b == 0])
-    if len(data) > 0:
-        percent = zeros / len(data) * 100
-    else:
-        percent = 0
+def count_zero(filename, chunksize=0):
+    if os.path.getsize(filename) == 0:
+        return 0
+    if chunksize == 0:
+        chunksize = os.path.getsize(filename)
+    with open(filename, 'rb') as f:
+        zeros = 0
+        while True:
+            data = f.read(chunksize)
+            if not data:
+                break;
+            zeros += len([b for b in data if b == 0])
+    percent = zeros / os.path.getsize(filename) * 100
     logger.info("{:6.2f}% {}".format(percent, filename))
     return percent
 
 
-def search_dir( dir='.', recursive=False):
+def search_dir(dir='.', recursive=False):
     logger.info('folder={} recursive={}'.format(
         dir, recursive
     ))
@@ -57,6 +62,9 @@ def main():
     argparser.add_argument(
         '-t', '--threshold', action='store', dest='threshold',
         help='Zero detection threshold', default=50)
+    argparser.add_argument(
+        '-s', '--chunk_size', action='store', dest='chunksize',
+        help='Chunk Size', default=0)
     args = argparser.parse_args()
     logger.debug('args: dir:"{}" / recursive:"{}"'.format(
         args.dir, args.recursive))
@@ -69,21 +77,28 @@ def main():
     threshold = float(args.threshold)
     for target in targets:
         try:
-            percent_zero = count_zero(target)
+            percent_zero = count_zero(target, args.chunksize)
             if percent_zero > threshold:
-                print( "Not ok: {:6.2f}%\t{}".format(
+                print("Not ok: {:6.2f}%\t{}".format(
                     percent_zero, target))
         except Exception as e:
-            logger.error( '{} error: {}'.format( target,e ))
+            logger.error('{} error: {}'.format(target, e))
 
 
 if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     # logger.setLevel(logging.ERROR)
     logging.getLogger("PIL").setLevel(logging.ERROR)
-    logging.basicConfig( level=logging.DEBUG )
+
+    # logging.basicConfig(
+    #     level=logging.DEBUG,
+    # )
+
+    # log_fh = open('debug.log', 'w', encoding='utf-8')
+    # ch = logging.StreamHandler(log_fh)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
     # logging.basicConfig( level=logging.ERROR )
+
     main()
-
-
-
